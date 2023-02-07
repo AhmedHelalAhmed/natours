@@ -1,20 +1,25 @@
 const express = require('express');
+const fs = require('fs');
 const app = express();
 const port = 3000;
 const OK = 200;
-app.get('/', (request, response) => {
+
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf8')
+);
+
+app.get('/api/v1/tours', (request, response) => {
   response.status(OK).json({
-    message: 'Hello from the server side!',
-    app: 'Natours',
+    // status maybe success - fail - error in jsend specification
+    // https://github.com/AhmedHelalAhmed/jsend
+    status: 'success',
+    results: tours.length, // results not part of jsend specification
+    data: {
+      tours,
+    },
   });
 });
 
-app.post('/', (request, response) => {
-  response.status(OK).json({
-    message: 'You can post to this endpoint...',
-    app: 'Natours',
-  });
-});
 app.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });
