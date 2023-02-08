@@ -9,7 +9,16 @@ const NOT_FOUND = 404;
 
 // middleware: required to make express work with body-parser
 app.use(express.json());
+// global middleware
+app.use((request, response, next) => {
+  console.log('Hello from middleware side');
+  next();
+});
 
+app.use((request, response, next) => {
+  request.requestTime = new Date().toISOString();
+  next();
+});
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf8')
 );
@@ -19,7 +28,8 @@ const getAllTours = (request, response) => {
     // status maybe success - fail - error in jsend specification
     // https://github.com/AhmedHelalAhmed/jsend
     status: 'success',
-    results: tours.length, // results not part of jsend specification
+    results: tours.length, // results not part of jsend specification.
+    requestedAt: request.requestTime,
     data: {
       tours,
     },
