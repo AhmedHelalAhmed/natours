@@ -6,7 +6,8 @@ const OK = 200;
 const CREATED = 201;
 const NOT_FOUND = 404;
 
-app.use(express.json()); // middleware: required to make express work with body-parser
+// middleware: required to make express work with body-parser
+app.use(express.json());
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf8')
@@ -61,6 +62,23 @@ app.post('/api/v1/tours', (request, response) => {
       });
     }
   );
+});
+
+app.patch('/api/v1/tours/:id', (request, response) => {
+  const tour = tours.find((tour) => tour.id === parseInt(request.params.id));
+  if (!tour) {
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
+
+  response.status(OK).json({
+    status: 'success',
+    data: {
+      tour: '<updated tour here...>',
+    },
+  });
 });
 app.listen(port, () => {
   console.log(`listening on port ${port}...`);
