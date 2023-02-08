@@ -8,6 +8,7 @@ const OK = 200;
 const ON_CONTENT = 204;
 const CREATED = 201;
 const NOT_FOUND = 404;
+const INTERNAL_SERVER_ERROR = 500;
 //1) middlewares
 
 // middleware: required to make express work with body-parser
@@ -106,6 +107,38 @@ const deleteTour = (request, response) => {
     data: null,
   });
 };
+
+const getAllUsers = (request, response) => {
+  response.status(INTERNAL_SERVER_ERROR).json({
+    status: 'error',
+    message: 'This route is not defined!',
+  });
+};
+const createUser = (request, response) => {
+  response.status(INTERNAL_SERVER_ERROR).json({
+    status: 'error',
+    message: 'This route is not defined!',
+  });
+};
+const getUser = (request, response) => {
+  response.status(INTERNAL_SERVER_ERROR).json({
+    status: 'error',
+    message: 'This route is not defined!',
+  });
+};
+const updateUser = (request, response) => {
+  response.status(INTERNAL_SERVER_ERROR).json({
+    status: 'error',
+    message: 'This route is not defined!',
+  });
+};
+const deleteUser = (request, response) => {
+  response.status(INTERNAL_SERVER_ERROR).json({
+    status: 'error',
+    message: 'This route is not defined!',
+  });
+};
+
 //3) routes
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app
@@ -113,6 +146,13 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+app
+  .route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 app.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });
