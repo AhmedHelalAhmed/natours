@@ -4,6 +4,18 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf8')
 );
 
+exports.checkIfTourExists = async (request, response, next, value) => {
+  console.log(`Tour id is: ${value}`);
+  const tour = tours.find((tour) => tour.id === parseInt(value));
+  if (!tour) {
+    return response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
+  request.tour = tour;
+  next();
+};
 exports.getAllTours = (request, response) => {
   response.status(OK).json({
     // status maybe success - fail - error in jsend specification
@@ -38,29 +50,14 @@ exports.createTour = (request, response) => {
   );
 };
 exports.getTour = (request, response) => {
-  const tour = tours.find((tour) => tour.id === parseInt(request.params.id));
-
-  if (!tour) {
-    response.status(NOT_FOUND).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-  }
   response.status(OK).json({
     status: 'success',
     data: {
-      tour,
+      tour: request.tour,
     },
   });
 };
 exports.updateTour = (request, response) => {
-  const tour = tours.find((tour) => tour.id === parseInt(request.params.id));
-  if (!tour) {
-    response.status(NOT_FOUND).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-  }
   response.status(OK).json({
     status: 'success',
     data: {
@@ -70,13 +67,6 @@ exports.updateTour = (request, response) => {
 };
 
 exports.deleteTour = (request, response) => {
-  const tour = tours.find((tour) => tour.id === parseInt(request.params.id));
-  if (!tour) {
-    response.status(NOT_FOUND).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-  }
   response.status(ON_CONTENT).json({
     status: 'success',
     data: null,
