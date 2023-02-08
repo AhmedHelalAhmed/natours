@@ -3,6 +3,7 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 const OK = 200;
+const ON_CONTENT = 204;
 const CREATED = 201;
 const NOT_FOUND = 404;
 
@@ -78,6 +79,20 @@ app.patch('/api/v1/tours/:id', (request, response) => {
     data: {
       tour: '<updated tour here...>',
     },
+  });
+});
+
+app.delete('/api/v1/tours/:id', (request, response) => {
+  const tour = tours.find((tour) => tour.id === parseInt(request.params.id));
+  if (!tour) {
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
+  response.status(ON_CONTENT).json({
+    status: 'success',
+    data: null,
   });
 });
 app.listen(port, () => {
