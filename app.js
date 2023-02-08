@@ -1,13 +1,18 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
+
 const app = express();
 const port = 3000;
 const OK = 200;
 const ON_CONTENT = 204;
 const CREATED = 201;
 const NOT_FOUND = 404;
+//1) middlewares
 
 // middleware: required to make express work with body-parser
+app.use(morgan('dev'));
+
 app.use(express.json());
 // global middleware
 app.use((request, response, next) => {
@@ -22,7 +27,7 @@ app.use((request, response, next) => {
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf8')
 );
-
+//2) route handlers
 const getAllTours = (request, response) => {
   response.status(OK).json({
     // status maybe success - fail - error in jsend specification
@@ -101,7 +106,7 @@ const deleteTour = (request, response) => {
     data: null,
   });
 };
-
+//3) routes
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app
   .route('/api/v1/tours/:id')
