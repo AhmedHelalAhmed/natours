@@ -1,3 +1,4 @@
+const fs = require('fs');
 const {
   OK,
   CREATED,
@@ -5,14 +6,14 @@ const {
   ON_CONTENT,
   BAD_REQUEST,
 } = require('../enums/httpResponse');
-const fs = require('fs');
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf8')
 );
 
 exports.checkIfTourExists = async (request, response, next, value) => {
   console.log(`Tour id is: ${value}`);
-  const tour = tours.find((tour) => tour.id === parseInt(value));
+  const tour = tours.find((item) => item.id === parseInt(value, 10));
   if (!tour) {
     return response.status(NOT_FOUND).json({
       status: 'fail',
