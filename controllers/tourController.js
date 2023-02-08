@@ -1,4 +1,10 @@
-const { OK, CREATED, NOT_FOUND, ON_CONTENT } = require('../enums/httpResponse');
+const {
+  OK,
+  CREATED,
+  NOT_FOUND,
+  ON_CONTENT,
+  BAD_REQUEST,
+} = require('../enums/httpResponse');
 const fs = require('fs');
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf8')
@@ -16,6 +22,17 @@ exports.checkIfTourExists = async (request, response, next, value) => {
   request.tour = tour;
   next();
 };
+
+exports.checkCreateTourBody = (request, response, next) => {
+  if (!request.body.name || !request.body.price) {
+    return response.status(BAD_REQUEST).json({
+      status: 'fail',
+      error: 'Name and price are required',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (request, response) => {
   response.status(OK).json({
     // status maybe success - fail - error in jsend specification
@@ -34,7 +51,7 @@ exports.createTour = (request, response) => {
   tours.push(newTour);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (error) => {
       if (error) {
