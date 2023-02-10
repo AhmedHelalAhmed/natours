@@ -1,5 +1,4 @@
 const dotEnv = require('dotenv');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
 
 dotEnv.config({ path: './config.env' });
