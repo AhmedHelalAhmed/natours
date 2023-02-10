@@ -1,4 +1,4 @@
-const fs = require('fs');
+const Tour = require('../models/tourModel');
 const {
   OK,
   CREATED,
@@ -7,86 +7,103 @@ const {
   BAD_REQUEST,
 } = require('../enums/httpResponse');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf8')
-);
-
 exports.checkIfTourExists = async (request, response, next, value) => {
   console.log(`Tour id is: ${value}`);
-  const tour = tours.find((item) => item.id === parseInt(value, 10));
-  if (!tour) {
-    return response.status(NOT_FOUND).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-  }
-  request.tour = tour;
   next();
 };
 
 exports.checkCreateTourBody = (request, response, next) => {
   if (!request.body.name || !request.body.price) {
-    return response.status(BAD_REQUEST).json({
-      status: 'fail',
-      error: 'Name and price are required',
-    });
+    console.log('in checkCreateTourBody');
   }
   next();
 };
 
-exports.getAllTours = (request, response) => {
-  response.status(OK).json({
-    // status maybe success - fail - error in jsend specification
-    // https://github.com/AhmedHelalAhmed/jsend
-    status: 'success',
-    results: tours.length, // results not part of jsend specification.
-    requestedAt: request.requestTime,
-    data: {
-      tours,
-    },
-  });
+exports.getAllTours = async (request, response) => {
+  try {
+    const tours = await Tour.find();
+    response.status(OK).json({
+      status: 'success',
+      data: {
+        results: tours.length,
+        tours,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
 };
-exports.createTour = (request, response) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = { id: newId, ...request.body };
-  tours.push(newTour);
+exports.createTour = async (request, response) => {
+  try {
+    const newTour = await Tour.create(request.body);
+    response.status(CREATED).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(BAD_REQUEST).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
+exports.getTour = async (request, response) => {
+  try {
+    const tour = await Tour.findById(request.params.id);
+    response.status(OK).json({
+      status: 'success',
+      data: {
+        tour: tour,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
+exports.updateTour = async (request, response) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
+      new: true, // this will return the updated document
+      runValidators: true,
+    });
+    response.status(OK).json({
+      status: 'success',
+      data: {
+        tour: tour,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
 
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (error) => {
-      if (error) {
-        console.log(error.message);
-      }
-      response.status(CREATED).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
-      });
-    }
-  );
-};
-exports.getTour = (request, response) => {
-  response.status(OK).json({
-    status: 'success',
-    data: {
-      tour: request.tour,
-    },
-  });
-};
-exports.updateTour = (request, response) => {
-  response.status(OK).json({
-    status: 'success',
-    data: {
-      tour: '<updated tour here...>',
-    },
-  });
-};
-
-exports.deleteTour = (request, response) => {
-  response.status(ON_CONTENT).json({
-    status: 'success',
-    data: null,
-  });
+exports.deleteTour = async (request, response) => {
+  try {
+    await Tour.findByIdAndDelete(request.params.id);
+    response.status(ON_CONTENT).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
 };

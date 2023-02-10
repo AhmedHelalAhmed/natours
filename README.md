@@ -6,6 +6,7 @@
 - expressjs
 - eslint
 - prettier
+- [jsend specification](https://github.com/AhmedHelalAhmed/jsend)
 
 # steps
 
