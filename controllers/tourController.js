@@ -19,6 +19,12 @@ exports.checkCreateTourBody = (request, response, next) => {
   next();
 };
 
+exports.aliasTopTours = (request, response, next) => {
+  request.query.limit = '5';
+  request.query.sort = '-ratingsAverage,price';
+  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 exports.getAllTours = async (request, response) => {
   try {
     const filters = { ...request.query };
