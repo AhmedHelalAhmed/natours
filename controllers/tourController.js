@@ -21,7 +21,45 @@ exports.checkCreateTourBody = (request, response, next) => {
 
 exports.getAllTours = async (request, response) => {
   try {
-    const tours = await Tour.find();
+    const filters = { ...request.query };
+    const excludedFields = ['page', 'limit', 'sort', 'fields'];
+    excludedFields.forEach((paramName) => delete filters[paramName]);
+    let queryString = JSON.stringify(filters);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
+    let query = Tour.find(JSON.parse(queryString));
+
+    if (request.query.sort) {
+      const sortBy = request.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query.sort('-createdAt');
+    }
+
+    if (request.query.fields) {
+      const fields = request.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v'); //exclude the field __v
+    }
+
+    const DEFAULT_PAGE = 1;
+    const DEFAULT_LIMIT = 10;
+    const page = parseInt(request.query.page, 10) || DEFAULT_PAGE;
+    const perPage = parseInt(request.query.limit, 10) || DEFAULT_LIMIT;
+    const skip = (page - 1) * perPage;
+    query = query.skip(skip).limit(perPage);
+
+    if (request.query.page) {
+      const numberOfTours = await Tour.countDocuments();
+      if (skip >= numberOfTours) {
+        throw new Error('Page number is out of bounds');
+      }
+    }
+
+    const tours = await query;
     response.status(OK).json({
       status: 'success',
       data: {
