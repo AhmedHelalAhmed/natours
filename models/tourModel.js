@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -59,6 +61,18 @@ const tourSchema = new mongoose.Schema(
 // we can not use this virtual field in query
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
+});
+
+// DOCUMENT MIDDLEWARE: runs before .save() and .create()
+// we can have as many as we want middlewares for the hook save
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+tourSchema.post('save', (doc, next) => {
+  console.log('in post', doc);
+  next();
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
