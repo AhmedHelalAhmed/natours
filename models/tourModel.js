@@ -52,6 +52,10 @@ const tourSchema = new mongoose.Schema(
       select: false, // hide from data that comes from api/database
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -75,6 +79,20 @@ tourSchema.post('save', (doc, next) => {
   next();
 });
 
+// QUERY MIDDLEWARE
+tourSchema.pre(/^find/, function (next) {
+  // to hide all secretTour
+  // [/^find/] to support find and findOne and findById and so on then use Regular Expression
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now(); // put property on the fly
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  next();
+});
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
