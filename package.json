@@ -7,7 +7,8 @@
     "start:dev": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "import:tours-to-database": "node commands/import-dev-data.js --import",
-    "delete:tours-from-database": "node commands/import-dev-data.js --delete"
+    "delete:tours-from-database": "node commands/import-dev-data.js --delete",
+    "debug": "node server.js"
   },
   "repository": {
     "type": "git",
