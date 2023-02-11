@@ -164,3 +164,60 @@ exports.getTourStatistics = async (req, res) => {
     });
   }
 };
+// implement a function to calculate the busiest month of a given year.
+// calculating how many tours start in each of the month of the given year.
+exports.getMonthlyPlan = async (request, response) => {
+  try {
+    const DSCENDING = -1;
+    const HIDE = 0;
+    const VALUE_PER_EACH_RECORD = 1;
+    const year = parseInt(request.params.year, 10); // 2021
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTourStarts: { $sum: VALUE_PER_EACH_RECORD },
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: { month: '$_id' },
+      },
+      {
+        $project: {
+          _id: HIDE, //0: to remove 1: to show
+        },
+      },
+      {
+        $sort: { numTourStarts: DSCENDING }, // -1 descending
+      },
+      // {
+      //   $limit: 12, //not needed actually in this case
+      // },
+    ]);
+
+    response.status(OK).json({
+      status: 'success',
+      data: {
+        plan,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(NOT_FOUND).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
