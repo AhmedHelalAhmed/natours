@@ -1,5 +1,9 @@
 const AppError = require('../utils/appError');
-const { BAD_REQUEST, INTERNAL_SERVER_ERROR } = require('../enums/httpResponse');
+const {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+} = require('../enums/httpResponse');
 const { ERROR_STATUS } = require('../enums/status');
 
 const handleCastErrorDB = (error) => {
@@ -23,6 +27,11 @@ const handleValidationErrorDB = (error) => {
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, BAD_REQUEST);
 };
+const handleJWTError = () =>
+  new AppError('Invalid token. Please log in again!', UNAUTHORIZED);
+
+const handleJWTExpiredError = () =>
+  new AppError('Your token has expired! Please log in again.', UNAUTHORIZED);
 
 const sendErrorDev = (error, response) => {
   response.status(error.statusCode).json({
@@ -75,6 +84,14 @@ module.exports = (error, request, response, next) => {
     if (userError._message === 'Validation failed') {
       userError = handleValidationErrorDB(userError);
     }
+
+    if (error.name === 'JsonWebTokenError') {
+      userError = handleJWTError();
+    }
+    if (error.name === 'TokenExpiredError') {
+      userError = handleJWTExpiredError();
+    }
+
     sendErrorProd(userError, response);
   }
 };
