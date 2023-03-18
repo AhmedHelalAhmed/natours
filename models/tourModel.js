@@ -183,11 +183,12 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 // AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  // Add the match in the beginning of the array
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   // Add the match in the beginning of the array
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
+// we need to make $geoNear to be the first stage
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;

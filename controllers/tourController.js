@@ -153,3 +153,47 @@ exports.getToursWithin = catchAsync(async (request, response, next) => {
     },
   });
 });
+
+exports.getDistances = catchAsync(async (request, response, next) => {
+  const { latlng, unit } = request.params;
+  const [lat, lng] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001; // to convert the distance from meters to the requested unit miles or kilometers
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        BAD_REQUEST
+      )
+    );
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      // this required the index on startLocation too
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1], // lat * 1 => to convert it to numbers
+        },
+        distanceField: 'distance', // it comes in meters
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        // to select only name and distance
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  response.status(OK).json({
+    status: SUCCESS_STATUS,
+    data: {
+      data: distances,
+    },
+  });
+});
