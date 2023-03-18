@@ -1,7 +1,7 @@
 const Review = require('../models/reviewModel');
 const factory = require('./handlerFactory');
 
-const { OK, CREATED } = require('../enums/httpResponse');
+const { OK } = require('../enums/httpResponse');
 const { SUCCESS_STATUS } = require('../enums/status');
 const catchAsync = require('../utils/catchAsync');
 
@@ -21,8 +21,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
     },
   });
 });
-
-exports.createReview = catchAsync(async (request, response, next) => {
+exports.setTourUserIds = (request, response, next) => {
   // Allow nested routes
   if (!request.body.tour) {
     request.body.tour = request.params.tourId;
@@ -30,13 +29,9 @@ exports.createReview = catchAsync(async (request, response, next) => {
   if (!request.body.user) {
     request.body.user = request.user.id;
   }
-  const newReview = await Review.create(request.body);
-  response.status(CREATED).json({
-    status: SUCCESS_STATUS,
-    data: {
-      review: newReview,
-    },
-  });
-});
+  next();
+};
 
+exports.createReview = factory.createOne(Review);
+exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);

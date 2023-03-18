@@ -1,5 +1,5 @@
 const Tour = require('../models/tourModel');
-const { OK, CREATED, NOT_FOUND } = require('../enums/httpResponse');
+const { OK, NOT_FOUND } = require('../enums/httpResponse');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const { SUCCESS_STATUS } = require('../enums/status');
@@ -41,15 +41,7 @@ exports.getAllTours = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (request, response, next) => {
-  const newTour = await Tour.create(request.body);
-  response.status(CREATED).json({
-    status: SUCCESS_STATUS,
-    data: {
-      tour: newTour,
-    },
-  });
-});
+exports.createTour = factory.createOne(Tour);
 
 exports.getTour = catchAsync(async (request, response, next) => {
   const tour = await Tour.findById(request.params.id).populate('reviews');
@@ -66,23 +58,7 @@ exports.getTour = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.updateTour = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
-    new: true, // this will return the updated document
-    runValidators: true,
-  });
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', NOT_FOUND));
-  }
-
-  response.status(OK).json({
-    status: SUCCESS_STATUS,
-    data: {
-      tour: tour,
-    },
-  });
-});
+exports.updateTour = factory.updateOne(Tour);
 
 exports.deleteTour = factory.deleteOne(Tour);
 

@@ -43,12 +43,9 @@ exports.getUser = (request, response) => {
     message: 'This route is not defined!',
   });
 };
-exports.updateUser = (request, response) => {
-  response.status(INTERNAL_SERVER_ERROR).json({
-    status: ERROR_STATUS,
-    message: 'This route is not defined!',
-  });
-};
+
+// Do not update passwords with this!
+exports.updateUser = factory.updateOne(User);
 
 exports.deleteUser = factory.deleteOne(User);
 
