@@ -131,6 +131,10 @@ tourSchema.index({
 tourSchema.index({
   slug: 1,
 });
+
+// we used 2dsphere index since it's a real point on the earth
+tourSchema.index({ startLocation: '2dsphere' }); // we can use 2D index if it's not a real point on the earth
+
 // we can not use this virtual field in query
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;

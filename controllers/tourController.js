@@ -1,8 +1,9 @@
 const Tour = require('../models/tourModel');
-const { OK } = require('../enums/httpResponse');
+const { OK, BAD_REQUEST } = require('../enums/httpResponse');
 const catchAsync = require('../utils/catchAsync');
 const { SUCCESS_STATUS } = require('../enums/status');
 const factory = require('./handlerFactory');
+const AppError = require('../utils/appError');
 
 exports.checkIfTourExists = async (request, response, next, value) => {
   console.log(`Tour id is: ${value}`);
@@ -114,6 +115,41 @@ exports.getMonthlyPlan = catchAsync(async (request, response, next) => {
     status: SUCCESS_STATUS,
     data: {
       plan,
+    },
+  });
+});
+
+// /tours-within/:distance/center/:latlng/unit/:unit
+// /tours-within/233/center/34.111745,-118.113491/unit/mi
+exports.getToursWithin = catchAsync(async (request, response, next) => {
+  const { distance, latlng, unit } = request.params;
+  const [lat, lng] = latlng.split(',');
+  const THE_RADIUS_OF_THE_EARTH_IN_MILES = 3963.2;
+  const THE_RADIUS_OF_THE_EARTH_IN_KILOMETRES = 6378.1;
+  const radius =
+    unit === 'mi'
+      ? distance / THE_RADIUS_OF_THE_EARTH_IN_MILES
+      : distance / THE_RADIUS_OF_THE_EARTH_IN_KILOMETRES; // change the distance to be in radians for mongodb to work on the query
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        BAD_REQUEST
+      )
+    );
+  }
+
+  // console.log(lat, lng, distance, unit);
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }, // we always put lng then lat as geo adjacent for some reason works like that
+  });
+  // we should add index to startLocation to make the query work
+  response.status(OK).json({
+    status: SUCCESS_STATUS,
+    results: tours.length,
+    data: {
+      data: tours,
     },
   });
 });
