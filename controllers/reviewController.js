@@ -10,7 +10,13 @@ const { ERROR_STATUS, SUCCESS_STATUS } = require('../enums/status');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  if (req.params.tourId) {
+    filter = {
+      tour: req.params.tourId,
+    };
+  }
+  const reviews = await Review.find(filter);
   res.status(OK).json({
     status: SUCCESS_STATUS,
     results: reviews.length,
