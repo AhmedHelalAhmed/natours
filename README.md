@@ -1,6 +1,8 @@
 # Natours
 
-# Technologies
+a project to apply nodejs express knowledge on it.
+
+## Technologies
 
 - nodejs
 - expressjs
@@ -8,7 +10,7 @@
 - prettier
 - [jsend specification](https://github.com/AhmedHelalAhmed/jsend)
 
-# steps
+## Steps and commands
 
 - ```npm intsall```
 - ```cp config.env.example config.env```
@@ -16,3 +18,6 @@
 - ``` npm run delete:database ```
 - ``` npm run import:database ```
 
+## Notes
+
+- The password for any user is ``` test1234 ```
