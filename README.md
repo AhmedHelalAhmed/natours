@@ -13,4 +13,6 @@
 - ```npm intsall```
 - ```cp config.env.example config.env```
 - ``` npm run start:dev ```
+- ``` npm run delete:database ```
+- ``` npm run import:database ```
 

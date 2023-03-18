@@ -47,7 +47,8 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
-
+// Start encryption step
+/*
 userSchema.pre('save', async function (next) {
   // Only run this function if password was actually modified
   if (!this.isModified('password')) {
@@ -72,7 +73,8 @@ userSchema.pre('save', function (next) {
 
   next();
 });
-
+// End encryption step
+*/
 userSchema.pre(/^find/, function (next) {
   // query middleware
   // this points to the current query
