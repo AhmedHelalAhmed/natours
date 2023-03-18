@@ -1,9 +1,7 @@
 const Tour = require('../models/tourModel');
-const { OK, NOT_FOUND } = require('../enums/httpResponse');
-const APIFeatures = require('../utils/apiFeatures');
+const { OK } = require('../enums/httpResponse');
 const catchAsync = require('../utils/catchAsync');
 const { SUCCESS_STATUS } = require('../enums/status');
-const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 exports.checkIfTourExists = async (request, response, next, value) => {
@@ -25,38 +23,11 @@ exports.aliasTopTours = (request, response, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (request, response, next) => {
-  const features = new APIFeatures(Tour.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-  response.status(OK).json({
-    status: SUCCESS_STATUS,
-    data: {
-      results: tours.length,
-      tours,
-    },
-  });
-});
+exports.getAllTours = factory.getAll(Tour);
 
 exports.createTour = factory.createOne(Tour);
 
-exports.getTour = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findById(request.params.id).populate('reviews');
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', NOT_FOUND));
-  }
-
-  response.status(OK).json({
-    status: SUCCESS_STATUS,
-    data: {
-      tour: tour,
-    },
-  });
-});
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 
 exports.updateTour = factory.updateOne(Tour);
 
