@@ -116,6 +116,20 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+// tourSchema.index({
+//   price: 1, // 1 ascending - 0 descending
+// });
+
+// with this compound index you don't need to make extra index on price nor ratingsAverage
+tourSchema.index({
+  price: 1, // 1 ascending
+  ratingsAverage: -1, // -1 descending
+});
+
+tourSchema.index({
+  slug: 1,
+});
 // we can not use this virtual field in query
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
