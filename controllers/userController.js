@@ -1,4 +1,6 @@
 const User = require('../models/userModel');
+const factory = require('./handlerFactory');
+
 const {
   INTERNAL_SERVER_ERROR,
   ON_CONTENT,
@@ -8,6 +10,7 @@ const {
 const { ERROR_STATUS, SUCCESS_STATUS } = require('../enums/status');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const Tour = require('../models/tourModel');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -47,12 +50,8 @@ exports.updateUser = (request, response) => {
     message: 'This route is not defined!',
   });
 };
-exports.deleteUser = (request, response) => {
-  response.status(INTERNAL_SERVER_ERROR).json({
-    status: ERROR_STATUS,
-    message: 'This route is not defined!',
-  });
-};
+
+exports.deleteUser = factory.deleteOne(User);
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create error if user POSTs password data

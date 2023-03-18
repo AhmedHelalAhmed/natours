@@ -1,4 +1,6 @@
 const Review = require('../models/reviewModel');
+const factory = require('./handlerFactory');
+
 const {
   INTERNAL_SERVER_ERROR,
   ON_CONTENT,
@@ -8,6 +10,7 @@ const {
 } = require('../enums/httpResponse');
 const { ERROR_STATUS, SUCCESS_STATUS } = require('../enums/status');
 const catchAsync = require('../utils/catchAsync');
+const Tour = require('../models/tourModel');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   let filter = {};
@@ -42,3 +45,5 @@ exports.createReview = catchAsync(async (request, response, next) => {
     },
   });
 });
+
+exports.deleteReview = factory.deleteOne(Review);

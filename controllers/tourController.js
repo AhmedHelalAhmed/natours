@@ -1,9 +1,10 @@
 const Tour = require('../models/tourModel');
-const { OK, CREATED, ON_CONTENT, NOT_FOUND } = require('../enums/httpResponse');
+const { OK, CREATED, NOT_FOUND } = require('../enums/httpResponse');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const { SUCCESS_STATUS } = require('../enums/status');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.checkIfTourExists = async (request, response, next, value) => {
   console.log(`Tour id is: ${value}`);
@@ -83,18 +84,7 @@ exports.updateTour = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.deleteTour = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findByIdAndDelete(request.params.id);
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', NOT_FOUND));
-  }
-
-  response.status(ON_CONTENT).json({
-    status: SUCCESS_STATUS,
-    data: null,
-  });
-});
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStatistics = catchAsync(async (request, response, next) => {
   const ASCENDING = 1;
