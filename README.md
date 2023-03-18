@@ -21,3 +21,7 @@ a project to apply nodejs express knowledge on it.
 ## Notes
 
 - The password for any user is ``` test1234 ```
+
+## Postman documentation
+
+[API Docs](https://documenter.getpostman.com/view/3913416/2s93JzLfvx)
