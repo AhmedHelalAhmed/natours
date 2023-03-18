@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function (next) {
   // this will make two queries
   // this.populate({
@@ -87,7 +89,7 @@ reviewSchema.post('save', function () {
 // findByIdAndDelete
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   this.currentReview = await this.findOne(); // it will get the old data but in our case we don't need review data but the tour
-  console.log(this.currentReview);
+  // console.log(this.currentReview);
   next();
 });
 
